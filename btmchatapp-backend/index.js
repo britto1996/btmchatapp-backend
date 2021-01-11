@@ -26,23 +26,16 @@ require("dotenv").config();
 
 const port = process.env.PORT;
 
-//import pusher
 
-const Pusher = require("pusher");
 
-//adding pusher for real time use
 
-const pusher = new Pusher({
-  appId: "1135444",
-  key: "dd134867654a1256e459",
-  secret: "1da03efbb4eeddfd8b2d",
-  cluster: "ap2",
-  useTLS: true
-});
+
 
 //import mongoose to access schema models
 
 const mongoose = require("mongoose");
+
+
 
 //db connection
 
@@ -55,13 +48,46 @@ mongoose.connect(
 
 const db = mongoose.connection
 
-const msgCollection = db.collection("messages")
-console.log(msgCollection)
+//import pusher
 
-const changeStream = msgCollection.watch();
-changeStream.on("change",(change)=>{
-  console.log("A change occured",change)
+const Pusher = require("pusher")
+
+const pusher = new Pusher({
+  appId: "1135917",
+  key: "5415468845a9fe175b94",
+  secret: "a0dda34c3c109607d1af",
+  cluster: "ap2",
+  useTLS: true
 })
+
+
+db.once("open",()=>{
+  const msgCollection = db.collection('messages')
+  const changeStream = msgCollection.watch()
+
+  changeStream.on("change",(change)=>{
+    console.log("A change occures",change)
+
+    if(change.operationType === 'insert'){
+      const messageDetails = change.fullDocument
+
+      pusher.trigger('messages','inserted',{
+        printing:console.log("pusher is triggered"),
+        name:messageDetails.name,
+        message:messageDetails.message
+        // printmsg:console.log(messageDetails.message)
+
+
+      })
+    }
+    else{
+      console.log("Error triggering pusher")
+    }
+  })
+})
+
+
+
 
 //first api response
 
@@ -75,4 +101,4 @@ app.listen(port, () => {
   console.log(`server is running on the port ${port}`);
 });
 
-//
+
