@@ -60,6 +60,9 @@ const pusher = new Pusher({
   useTLS: true
 })
 
+//securing the messages
+
+
 
 db.once("open",()=>{
   const msgCollection = db.collection('messages')
@@ -74,8 +77,10 @@ db.once("open",()=>{
       pusher.trigger('messages','inserted',{
         printing:console.log("pusher is triggered"),
         name:messageDetails.name,
-        message:messageDetails.message
+        message:messageDetails.message,
         // printmsg:console.log(messageDetails.message)
+        timestamp:messageDetails.timestamp,
+        recieved:messageDetails.recieved
 
 
       })
@@ -92,6 +97,7 @@ db.once("open",()=>{
 //first api response
 
 app.use("/api",routePages)
+
 
 app.get("/test", (req, res) => {
   res.send("fuck");
