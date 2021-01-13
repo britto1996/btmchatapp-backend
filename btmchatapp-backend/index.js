@@ -24,7 +24,7 @@ require("dotenv").config();
 
 //port number
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT;
 
 
 
